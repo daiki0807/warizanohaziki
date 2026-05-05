@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>割り算（おはじき）</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- コントロールパネル -->
+    <div class="controls-area">
+      <div class="control-group">
+        <label>おはじき：</label>
+        <button id="btn-token-dec" class="ctrl-btn">-</button>
+        <span id="token-count" class="count-display">12</span>
+        <button id="btn-token-inc" class="ctrl-btn">+</button>
+      </div>
+      <div class="control-group">
+        <label>お皿：</label>
+        <button id="btn-plate-dec" class="ctrl-btn">-</button>
+        <span id="plate-count" class="count-display">3</span>
+        <button id="btn-plate-inc" class="ctrl-btn">+</button>
+      </div>
+      <button id="btn-reset" class="reset-btn">最初から</button>
+    </div>
+
+    <div class="workspace">
+      <!-- 左側：おはじきのプール -->
+      <div class="pool-area" id="pool">
+        <!-- JavaScriptで動的に生成します -->
+      </div>
+      
+      <!-- 右側：お皿エリア -->
+      <div class="plates-area" id="plates-area">
+        <!-- JavaScriptで動的に生成します -->
+      </div>
+    </div>
+
+    <!-- ヘルプボタン -->
+    <button class="help-btn" id="help-btn">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <span>ヘルプ</span>
+    </button>
+  </div>
+
+  <!-- SVG定義 (非表示) -->
+  <svg style="display: none;">
+    <defs>
+      <g id="flower-token">
+        <path d="M 32 10 
+                 C 40 -2, 58 10, 50 25
+                 C 66 30, 60 50, 45 45
+                 C 45 62, 20 62, 20 45
+                 C 5 50, -2 30, 15 25
+                 C 6 10, 24 -2, 32 10 Z
+                 M 32 22 A 10 10 0 1 0 32 42 A 10 10 0 1 0 32 22 Z" 
+              fill="#ff6b6b" stroke="#e03131" stroke-width="2.5" fill-rule="evenodd"/>
+      </g>
+    </defs>
+  </svg>
+
+  <script src="script.js"></script>
+</body>
+</html>

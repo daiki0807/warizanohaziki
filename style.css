@@ -1,0 +1,214 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background-color: #fafafa;
+  color: #333;
+  overflow: hidden; /* 防止スクロール */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+/* コントロールパネル */
+.controls-area {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px dashed #ddd;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.ctrl-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #222;
+  background-color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.ctrl-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px rgba(0,0,0,0.8);
+}
+
+.count-display {
+  display: inline-block;
+  width: 40px;
+  text-align: center;
+  font-size: 1.3rem;
+  background-color: #eee;
+  padding: 0.2rem 0;
+  border-radius: 8px;
+}
+
+.reset-btn {
+  background-color: #ff6b6b;
+  color: white;
+  border: 2px solid #222;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.reset-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px rgba(0,0,0,0.8);
+}
+
+.workspace {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+}
+
+/* 左側：プールのエリア */
+.pool-area {
+  flex: 1;
+  position: relative;
+  /* 境界線は表示せず、単なる配置エリアとする */
+}
+
+/* 右側：お皿のエリア */
+.plates-area {
+  flex: 1.5;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 1rem 0;
+}
+
+/* お皿のデザイン */
+.plate {
+  flex: 1;
+  background-color: #e3f2fd;
+  border: 4px solid #222;
+  border-radius: 12px;
+  position: relative;
+  /* お皿の立体感を出す */
+  box-shadow: 
+    inset 0 0 0 8px rgba(255, 255, 255, 0.4),
+    inset 0 0 10px rgba(0,0,0,0.1),
+    4px 4px 0px rgba(0,0,0,0.8);
+  transition: all 0.2s;
+}
+
+.plate.drag-over {
+  background-color: #bbdefb;
+  box-shadow: 
+    inset 0 0 0 8px rgba(255, 255, 255, 0.5),
+    inset 0 0 15px rgba(0,0,0,0.2),
+    4px 4px 0px rgba(0,0,0,0.8);
+  transform: scale(1.02);
+}
+
+/* おはじき（トークン） */
+.token {
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  cursor: grab;
+  touch-action: none; /* スマホでのスクロールを防止 */
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+  transition: transform 0.1s;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.token svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* SVG自体はイベントを受け取らない */
+}
+
+.token:active, .token.dragging {
+  cursor: grabbing;
+  z-index: 100;
+  filter: drop-shadow(5px 5px 6px rgba(0,0,0,0.3));
+  transform: scale(1.1);
+}
+
+/* ヘルプボタン */
+.help-btn {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  background-color: #fdd835;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+  font-family: inherit;
+  font-weight: 700;
+  color: #333;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.help-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px rgba(0,0,0,0.1);
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+  .workspace {
+    flex-direction: column;
+  }
+  
+  .plates-area {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 60%;
+  }
+
+  .pool-area {
+    height: 40%;
+  }
+
+  .help-btn {
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
