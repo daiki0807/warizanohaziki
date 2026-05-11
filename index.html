@@ -14,15 +14,21 @@
       <div class="control-group">
         <label>おはじき：</label>
         <button id="btn-token-dec" class="ctrl-btn">-</button>
-        <span id="token-count" class="count-display">12</span>
+        <input id="token-count" class="count-input" type="text" value="12" inputmode="numeric" pattern="[0-9]*" aria-label="おはじきの数">
         <button id="btn-token-inc" class="ctrl-btn">+</button>
       </div>
       <div class="control-group">
         <label>お皿：</label>
         <button id="btn-plate-dec" class="ctrl-btn">-</button>
-        <span id="plate-count" class="count-display">3</span>
+        <input id="plate-count" class="count-input" type="text" value="3" inputmode="numeric" pattern="[0-9]*" aria-label="お皿の数">
         <button id="btn-plate-inc" class="ctrl-btn">+</button>
       </div>
+      <div class="division-entry" id="division-entry" aria-label="割り算の式">
+        <span id="division-dividend">12</span>
+        <span>÷</span>
+        <span id="division-divisor">3</span>
+      </div>
+      <button id="btn-division" class="mode-btn" type="button" aria-pressed="false">割り算</button>
       <button id="btn-reset" class="reset-btn">最初から</button>
       <div class="handwriting-controls" aria-label="手書きモード">
         <button id="btn-handwriting" class="mode-btn" type="button" aria-pressed="false">手書き</button>

@@ -8,23 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // UI Controls
   const btnTokenDec = document.getElementById('btn-token-dec');
   const btnTokenInc = document.getElementById('btn-token-inc');
-  const tokenCountSpan = document.getElementById('token-count');
+  const tokenCountInput = document.getElementById('token-count');
   
   const btnPlateDec = document.getElementById('btn-plate-dec');
   const btnPlateInc = document.getElementById('btn-plate-inc');
-  const plateCountSpan = document.getElementById('plate-count');
+  const plateCountInput = document.getElementById('plate-count');
   
   const btnReset = document.getElementById('btn-reset');
+  const btnDivision = document.getElementById('btn-division');
   const btnHandwriting = document.getElementById('btn-handwriting');
   const btnPen = document.getElementById('btn-pen');
   const btnCircle = document.getElementById('btn-circle');
   const btnClearDrawing = document.getElementById('btn-clear-drawing');
   const handwritingControls = document.querySelector('.handwriting-controls');
+  const divisionEntry = document.getElementById('division-entry');
+  const divisionDividend = document.getElementById('division-dividend');
+  const divisionDivisor = document.getElementById('division-divisor');
 
   let tokensCount = 12;
   let platesCount = 3;
   let plates = [];
   let tokens = [];
+  let divisionEnabled = false;
   let handwritingEnabled = false;
   let drawingTool = 'pen';
   let savedDrawings = [];
@@ -45,8 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateDisplays() {
-    tokenCountSpan.textContent = tokensCount;
-    plateCountSpan.textContent = platesCount;
+    if (document.activeElement !== tokenCountInput) {
+      tokenCountInput.value = tokensCount;
+    }
+    if (document.activeElement !== plateCountInput) {
+      plateCountInput.value = platesCount;
+    }
+    divisionDividend.textContent = tokensCount;
+    divisionDivisor.textContent = platesCount;
   }
 
   function renderPlates() {
@@ -137,6 +148,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnReset.addEventListener('click', () => {
     renderTokens();
+  });
+
+  tokenCountInput.addEventListener('input', () => {
+    updateCountFromInput(tokenCountInput, 1, 40, value => {
+      tokensCount = value;
+      renderTokens();
+    });
+  });
+
+  plateCountInput.addEventListener('input', () => {
+    updateCountFromInput(plateCountInput, 1, 10, value => {
+      platesCount = value;
+      renderPlates();
+      renderTokens();
+    });
+  });
+
+  tokenCountInput.addEventListener('focus', () => tokenCountInput.select());
+  plateCountInput.addEventListener('focus', () => plateCountInput.select());
+
+  tokenCountInput.addEventListener('blur', updateDisplays);
+  plateCountInput.addEventListener('blur', updateDisplays);
+
+  function updateCountFromInput(input, min, max, applyValue) {
+    input.value = input.value.replace(/\D/g, '');
+    if (input.value === '') return;
+
+    const parsedValue = Number(input.value);
+    if (!Number.isInteger(parsedValue)) return;
+
+    const nextValue = Math.min(max, Math.max(min, parsedValue));
+    if (String(nextValue) !== input.value) {
+      input.value = nextValue;
+    }
+
+    applyValue(nextValue);
+    updateDisplays();
+  }
+
+  // --- 割り算モード ---
+  btnDivision.addEventListener('click', () => {
+    divisionEnabled = !divisionEnabled;
+    workspace.classList.toggle('division-active', divisionEnabled);
+    divisionEntry.classList.toggle('is-visible', divisionEnabled);
+    btnDivision.classList.toggle('division-active', divisionEnabled);
+    btnDivision.setAttribute('aria-pressed', String(divisionEnabled));
+    updateDisplays();
   });
 
   // --- 手書きモード ---
@@ -356,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const helpBtn = document.getElementById('help-btn');
   if (helpBtn) {
     helpBtn.addEventListener('click', () => {
-      alert('おはじきをドラッグして、お皿に分けてみましょう！\n上部のボタンでおはじきとお皿の数を変更できます。');
+      alert('おはじきをドラッグして、お皿に分けてみましょう！\n「割り算」を押すと、式とお皿ごとの数を見ながら分けられます。\n上部のボタンでおはじきとお皿の数を変更できます。');
     });
   }
 

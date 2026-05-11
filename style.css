@@ -59,14 +59,47 @@ body {
   box-shadow: 0px 0px 0px rgba(0,0,0,0.8);
 }
 
-.count-display {
-  display: inline-block;
+.count-input {
   width: 40px;
+  height: 36px;
+  border: none;
   text-align: center;
   font-size: 1.3rem;
+  font-weight: 700;
   background-color: #eee;
   padding: 0.2rem 0;
   border-radius: 8px;
+  font-family: inherit;
+  color: #333;
+}
+
+.count-input:focus {
+  outline: 3px solid #fdd835;
+  outline-offset: 2px;
+}
+
+.count-input::-webkit-outer-spin-button,
+.count-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.division-entry {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  border: 2px solid #222;
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
+  background-color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+.division-entry.is-visible {
+  display: inline-flex;
 }
 
 .reset-btn {
@@ -113,6 +146,11 @@ body {
 
 .mode-btn[aria-pressed="true"] {
   background-color: #4dabf7;
+  color: #fff;
+}
+
+.mode-btn.division-active {
+  background-color: #51cf66;
   color: #fff;
 }
 
@@ -283,6 +321,10 @@ body {
     width: 100%;
     justify-content: center;
     padding-left: 0;
+  }
+
+  .division-entry.is-visible {
+    display: inline-flex;
   }
 
   .workspace {
