@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const workspace = document.querySelector('.workspace');
   const pool = document.getElementById('pool');
   const platesArea = document.getElementById('plates-area');
+  const drawingCanvas = document.getElementById('drawing-canvas');
+  const drawingCtx = drawingCanvas.getContext('2d');
   
   // UI Controls
   const btnTokenDec = document.getElementById('btn-token-dec');
@@ -12,11 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const plateCountSpan = document.getElementById('plate-count');
   
   const btnReset = document.getElementById('btn-reset');
+  const btnHandwriting = document.getElementById('btn-handwriting');
+  const btnPen = document.getElementById('btn-pen');
+  const btnCircle = document.getElementById('btn-circle');
+  const btnClearDrawing = document.getElementById('btn-clear-drawing');
+  const handwritingControls = document.querySelector('.handwriting-controls');
 
   let tokensCount = 12;
   let platesCount = 3;
   let plates = [];
   let tokens = [];
+  let handwritingEnabled = false;
+  let drawingTool = 'pen';
+  let savedDrawings = [];
+  let activeDrawing = null;
 
   // ドラッグ＆ドロップのステート
   let activeToken = null;
@@ -29,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPlates();
     renderTokens();
     updateDisplays();
+    resizeDrawingCanvas();
   }
 
   function updateDisplays() {
@@ -126,8 +139,150 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTokens();
   });
 
+  // --- 手書きモード ---
+  btnHandwriting.addEventListener('click', () => {
+    handwritingEnabled = !handwritingEnabled;
+    workspace.classList.toggle('handwriting-active', handwritingEnabled);
+    handwritingControls.classList.toggle('is-enabled', handwritingEnabled);
+    btnHandwriting.setAttribute('aria-pressed', String(handwritingEnabled));
+    resizeDrawingCanvas();
+  });
+
+  btnPen.addEventListener('click', () => setDrawingTool('pen'));
+  btnCircle.addEventListener('click', () => setDrawingTool('circle'));
+  btnClearDrawing.addEventListener('click', () => {
+    savedDrawings = [];
+    activeDrawing = null;
+    redrawCanvas();
+  });
+
+  drawingCanvas.addEventListener('pointerdown', drawingStart);
+  drawingCanvas.addEventListener('pointermove', drawingMove);
+  drawingCanvas.addEventListener('pointerup', drawingEnd);
+  drawingCanvas.addEventListener('pointercancel', drawingEnd);
+
+  function setDrawingTool(tool) {
+    drawingTool = tool;
+    btnPen.classList.toggle('is-active', tool === 'pen');
+    btnCircle.classList.toggle('is-active', tool === 'circle');
+    btnPen.setAttribute('aria-pressed', String(tool === 'pen'));
+    btnCircle.setAttribute('aria-pressed', String(tool === 'circle'));
+  }
+
+  function resizeDrawingCanvas() {
+    const rect = workspace.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const pixelRatio = window.devicePixelRatio || 1;
+    drawingCanvas.width = Math.round(rect.width * pixelRatio);
+    drawingCanvas.height = Math.round(rect.height * pixelRatio);
+    drawingCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    redrawCanvas();
+  }
+
+  function getDrawingPoint(e) {
+    const rect = drawingCanvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+
+  function drawingStart(e) {
+    if (!handwritingEnabled) return;
+    e.preventDefault();
+
+    const point = getDrawingPoint(e);
+    if (drawingTool === 'circle') {
+      activeDrawing = { type: 'circle', start: point, end: point };
+    } else {
+      activeDrawing = { type: 'pen', points: [point] };
+    }
+    drawingCanvas.setPointerCapture(e.pointerId);
+  }
+
+  function drawingMove(e) {
+    if (!activeDrawing) return;
+    e.preventDefault();
+
+    const point = getDrawingPoint(e);
+    if (activeDrawing.type === 'circle') {
+      activeDrawing.end = point;
+    } else {
+      activeDrawing.points.push(point);
+    }
+    redrawCanvas(activeDrawing);
+  }
+
+  function drawingEnd(e) {
+    if (!activeDrawing) return;
+    e.preventDefault();
+
+    const drawing = activeDrawing;
+    activeDrawing = null;
+    if (!isTinyDrawing(drawing)) {
+      savedDrawings.push(drawing);
+    }
+    if (drawingCanvas.hasPointerCapture(e.pointerId)) {
+      drawingCanvas.releasePointerCapture(e.pointerId);
+    }
+    redrawCanvas();
+  }
+
+  function isTinyDrawing(drawing) {
+    if (drawing.type === 'pen') {
+      return drawing.points.length < 2;
+    }
+
+    const width = Math.abs(drawing.end.x - drawing.start.x);
+    const height = Math.abs(drawing.end.y - drawing.start.y);
+    return width < 8 || height < 8;
+  }
+
+  function redrawCanvas(previewDrawing = null) {
+    const rect = drawingCanvas.getBoundingClientRect();
+    drawingCtx.clearRect(0, 0, rect.width, rect.height);
+
+    savedDrawings.forEach(drawDrawing);
+    if (previewDrawing) {
+      drawDrawing(previewDrawing);
+    }
+  }
+
+  function drawDrawing(drawing) {
+    drawingCtx.save();
+    drawingCtx.strokeStyle = '#e03131';
+    drawingCtx.lineWidth = 5;
+    drawingCtx.lineCap = 'round';
+    drawingCtx.lineJoin = 'round';
+
+    if (drawing.type === 'circle') {
+      const x = Math.min(drawing.start.x, drawing.end.x);
+      const y = Math.min(drawing.start.y, drawing.end.y);
+      const width = Math.abs(drawing.end.x - drawing.start.x);
+      const height = Math.abs(drawing.end.y - drawing.start.y);
+      drawingCtx.beginPath();
+      drawingCtx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
+      drawingCtx.stroke();
+      drawingCtx.restore();
+      return;
+    }
+
+    drawingCtx.beginPath();
+    drawing.points.forEach((point, index) => {
+      if (index === 0) {
+        drawingCtx.moveTo(point.x, point.y);
+      } else {
+        drawingCtx.lineTo(point.x, point.y);
+      }
+    });
+    drawingCtx.stroke();
+    drawingCtx.restore();
+  }
+
   // --- ドラッグ＆ドロップロジック ---
   function dragStart(e) {
+    if (handwritingEnabled) return;
     if (e.button !== 0 && e.type === 'mousedown') return;
 
     activeToken = e.currentTarget;
@@ -211,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // シンプルにするため、リセットボタンと同じ挙動（初期位置に戻す）にします。
     // もし配置済みのものを動かしたくない場合は工夫が必要ですが、ここでは再描画します。
     renderTokens();
+    resizeDrawingCanvas();
   });
 
   // 初回描画（DOMのレイアウト計算が終わったタイミングで実行）

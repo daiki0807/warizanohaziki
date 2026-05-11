@@ -87,10 +87,86 @@ body {
   box-shadow: 0px 0px 0px rgba(0,0,0,0.8);
 }
 
+.handwriting-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.mode-btn,
+.tool-btn,
+.clear-btn {
+  min-height: 36px;
+  border: 2px solid #222;
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  background-color: #fff;
+  color: #333;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
+}
+
+.mode-btn[aria-pressed="true"] {
+  background-color: #4dabf7;
+  color: #fff;
+}
+
+.tool-btn {
+  display: none;
+}
+
+.handwriting-controls.is-enabled .tool-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tool-btn.is-active {
+  background-color: #fdd835;
+}
+
+.clear-btn {
+  display: none;
+  background-color: #f1f3f5;
+}
+
+.handwriting-controls.is-enabled .clear-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mode-btn:active,
+.tool-btn:active,
+.clear-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px rgba(0,0,0,0.8);
+}
+
 .workspace {
   display: flex;
   flex: 1;
   gap: 2rem;
+  position: relative;
+  min-height: 0;
+}
+
+.drawing-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.workspace.handwriting-active .drawing-canvas {
+  pointer-events: auto;
+  cursor: crosshair;
 }
 
 /* 左側：プールのエリア */
@@ -191,8 +267,27 @@ body {
 
 /* レスポンシブ調整 */
 @media (max-width: 768px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+
+  .controls-area {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-content: flex-start;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .handwriting-controls {
+    width: 100%;
+    justify-content: center;
+    padding-left: 0;
+  }
+
   .workspace {
     flex-direction: column;
+    gap: 1rem;
   }
   
   .plates-area {

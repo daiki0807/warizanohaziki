@@ -24,9 +24,16 @@
         <button id="btn-plate-inc" class="ctrl-btn">+</button>
       </div>
       <button id="btn-reset" class="reset-btn">最初から</button>
+      <div class="handwriting-controls" aria-label="手書きモード">
+        <button id="btn-handwriting" class="mode-btn" type="button" aria-pressed="false">手書き</button>
+        <button id="btn-pen" class="tool-btn is-active" type="button" aria-pressed="true">書く</button>
+        <button id="btn-circle" class="tool-btn" type="button" aria-pressed="false">丸</button>
+        <button id="btn-clear-drawing" class="clear-btn" type="button">消す</button>
+      </div>
     </div>
 
     <div class="workspace">
+      <canvas id="drawing-canvas" class="drawing-canvas" aria-label="手書き用キャンバス"></canvas>
       <!-- 左側：おはじきのプール -->
       <div class="pool-area" id="pool">
         <!-- JavaScriptで動的に生成します -->
